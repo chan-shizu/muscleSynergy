@@ -1,7 +1,7 @@
 clc;
 clear;
 % pathOfMuscleActivity = "measuredWave\SwalOptResult_27m_ver3.csv";%インポートしたcsvファイルの中の10^-18くらいより小さな数は、matlabでは誤った値になるので事前にcsvファイルを修正
-pathOfMuscleActivity = "measuredWave\arranged\arranged_Active_level軌跡考察63m.csv";
+pathOfMuscleActivity = "measuredWave\arranged\27mArranged.csv";
 Wav = readmatrix(pathOfMuscleActivity);
 DataNumW = size(Wav);
 plot(Wav(:,:));
@@ -11,7 +11,7 @@ d = 25; % 筋電センサーの数
 L = 15;%15; % 繰り返し計算の回数
 dawn = 1;
 dt = 0.01*dawn;%0.001*dawn; % 時間の差
-maxSynergyNumber = 10;
+maxSynergyNumber = 4;
 % movetime=3.0;%2.2;
 movetime=DataNumW(1)*dt;%2.2;
 %     caltime=3.5;
@@ -19,10 +19,10 @@ caltime=movetime;%2.2;
 M2=0;
 calculatedWave=0;
 % Tw = 1.2/(dawn*dt);%0.9*1000/dawn ;   % シナジー継続時間Twの設定
-TwTemp = int8(caltime/(dawn*dt)/2);%0.9*1000/dawn ;   % シナジー継続時間Twの設定
+TwTemp = int8(caltime/(dawn*dt)/1.5);%0.9*1000/dawn ;   % シナジー継続時間Twの設定
 % Tw = double(Tw);
 Tw = zeros(1,maxSynergyNumber);
-Tw(:) = TwTemp;
+Tw(:) = [int8(caltime/(dawn*dt)/1.5),int8(caltime/(dawn*dt)/4),int8(caltime/(dawn*dt)/1.5),int8(caltime/(dawn*dt)/1.5)];
 
 startt=1; %正常に計測が開始されている点?
 tmaxW = DataNumW(1);
@@ -244,6 +244,8 @@ for N=1:maxSynergyNumber
         if (l>10) & (E2min > E2(l))
             E2min = E2(l);
             minNumber = l;
+% E2min = E2(1);
+%             minNumber = 1;
 %             l
         end
         
