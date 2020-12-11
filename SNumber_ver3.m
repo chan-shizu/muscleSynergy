@@ -72,7 +72,7 @@ for N=1:maxSynergyNumber
     WH=0;
     
     c(:)=mean(mean(WavData))/mean(mean(w(:,:,1:N)));  %係数ciの計算, 各筋肉の(筋電図波形の平均/計算波形の平均)の平均
-%     c = ones(1,N);
+%         c = ones(1,N);
     %% 1回目の計算
     for  l=1:L    %繰り返し計算の回数
         c(i)=mean(mean(WavData))/mean(mean(w(:,:,i)));
@@ -153,9 +153,11 @@ for N=1:maxSynergyNumber
                 elseif i==N
                     synergyStartTime(i)=tmaxW-Tw(i);
                 else
-                    if topt(1,1,i-1,l)+20+Tw(i)>tmaxW  %topt(1,1,i-1,l)+20+Tw(i)>tmaxW
-                        %                     synergyStartTime(i)=tmaxW-Tw(i);
-                        synergyStartTime(i)=tmaxW-Tw(i);
+                    %                     if topt(1,1,i-1,l)+20+Tw(i)>tmaxW  %topt(1,1,i-1,l)+20+Tw(i)>tmaxW
+                    %                         %                     synergyStartTime(i)=tmaxW-Tw(i);
+                    %                         synergyStartTime(i)=tmaxW-Tw(i);
+                    if topt(1,1,i-1,l)>Tw(i)  %topt(1,1,i-1,l)+stepWidth+Tw(i)>tmaxW
+                        synergyStartTime(i)=topt(1,1,i+1,l)-Tw(i);
                     else
                         %                     synergyStartTime(i)=topt(1,1,i-1,l)+20; %この後で求めるtoptに20を足す
                         synergyStartTime(i)=topt(1,1,i-1,l)+20; %この後で求めるtoptに20を足す
@@ -176,8 +178,9 @@ for N=1:maxSynergyNumber
                     
                 else %1<i<Nの場合
                     
-                    if topt(1,1,i-1,l)+Tw(i)>tmaxW
+                    if topt(1,1,i-1,l)+2*Tw(i)>tmaxW
                         synergyEndTime(i)=tmaxW-Tw(i);
+
                     else
                         %                     synergyEndTime(i)=topt(1,1,i-1,l)+Tw(i);
                         synergyEndTime(i)=topt(1,1,i-1,l)+Tw(i);
@@ -212,14 +215,14 @@ for N=1:maxSynergyNumber
         end
         
         %% 係数cの決定
-%         for synergyNumber = 1:N
-% %                 updateC(synergyNumber)=(trace(WavData * M))./(trace(M.' * M)); %デコンポジションアルゴリズムでの残差
-%                 updateC(synergyNumber) = mean(mean(WavData))/mean(mean(M));
-% %                 c(1:N) = c(1:N).*updateC ;
-%                 c(synergyNumber) = c(synergyNumber)*updateC(synergyNumber) ;
-% %                   c(1:N) = cStart;
-% %                 c = cnew;
-%         end
+%                 for synergyNumber = 1:N
+%         %                 updateC(synergyNumber)=(trace(WavData * M))./(trace(M.' * M)); %デコンポジションアルゴリズムでの残差
+%                         updateC(synergyNumber) = mean(mean(WavData))/mean(mean(M));
+%         %                 c(1:N) = c(1:N).*updateC ;
+%                         c(synergyNumber) = c(synergyNumber)*updateC(synergyNumber) ;
+%         %                   c(1:N) = cStart;
+%         %                 c = cnew;
+%                 end
         
         %% wの更新
         for i=1:N
@@ -232,8 +235,6 @@ for N=1:maxSynergyNumber
                     wnew(1:d,x,i) = wt(:,x,i).*(WavDataT(:,x)./M(:,x)); %筋シナジーを更新
                 end
             end
-            i
-            l
             w(:,1:Tw(i),i) = wnew(:,topt(1,1,i,l)+1:topt(1,1,i,l)+Tw(i),i);
         end
         
@@ -243,7 +244,7 @@ for N=1:maxSynergyNumber
         if (l>10) & (E2min > E2(l))
             E2min = E2(l);
             minNumber = l;
-            l
+%             l
         end
         
         for i = 1:N
@@ -315,7 +316,7 @@ for N=1:maxSynergyNumber
     %         break
     %     end
     
-    if N==5
+    if N==3
         Snumber=SS(1,N);
         break
     end
